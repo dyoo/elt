@@ -68,12 +68,22 @@ public class TerminalView extends ViewPart implements ISaveablePart2 {
     openTerminalView(null, workingDirectory);
   }
 
+  private static int gensym = 0;
+  
+  /**
+   * Returns a fresh integer.
+   */
+  private static int nextGensym() {
+    return gensym++;
+  }
+  
   private static void openTerminalView(String id, IPath workingDirectory) {
     IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
     IPath safeWorkingDirectory = (workingDirectory != null) ? workingDirectory : userHomeDirectory();
     try {
       String directoryName = safeWorkingDirectory.lastSegment();
-      String secondaryId = (id != null) ? id : directoryName;
+      // Use of gensym to force freshness of the identifier.
+      String secondaryId = (id != null) ? id : safeWorkingDirectory.toString() + nextGensym();
       TerminalView view = (TerminalView) page.showView(VIEW_ID, secondaryId, VIEW_ACTIVATE);
       view.setPartName(directoryName);
       view.open(safeWorkingDirectory);
