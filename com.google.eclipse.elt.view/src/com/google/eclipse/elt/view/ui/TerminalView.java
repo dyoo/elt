@@ -88,7 +88,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2 {
     IPath safeWorkingDirectory = (workingDirectory != null) ? workingDirectory : userHomeDirectory();
     try {
       String directoryName = safeWorkingDirectory.lastSegment();
-      // Use of gensym to force freshness of the identifier.
+      // Use of a gensym to force freshness of the identifier.
       String secondaryId = nextGensym().toString();
       TerminalView view = (TerminalView) page.showView(VIEW_ID, secondaryId, VIEW_ACTIVATE);
       view.setPartName(directoryName);
@@ -106,7 +106,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2 {
   @Override public void saveState(IMemento memento) {
     saveState(memento, SCROLL_LOCK_ENABLED, String.valueOf(terminalWidget.isScrollLockEnabled()));
     saveState(memento, TITLE_STATE_TYPE, getPartName());
-    saveState(memento, WORKING_DIRECTORY_STATE_TYPE, workingDirectory.toOSString());
+    saveState(memento, WORKING_DIRECTORY_STATE_TYPE,
+        workingDirectory != null ? workingDirectory.toOSString() : null);
   }
 
   private void saveState(IMemento memento, String type, String data) {
