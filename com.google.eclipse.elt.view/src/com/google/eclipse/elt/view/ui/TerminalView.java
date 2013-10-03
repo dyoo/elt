@@ -13,15 +13,12 @@ import static org.eclipse.core.runtime.Status.OK_STATUS;
 import static org.eclipse.jface.resource.JFaceResources.TEXT_FONT;
 import static org.eclipse.jface.window.Window.OK;
 import static org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE;
-
 import static com.google.eclipse.elt.view.Activator.*;
 import static com.google.eclipse.elt.view.ImageKeys.*;
 import static com.google.eclipse.elt.view.preferences.ColorsAndFontsPreferences.*;
 import static com.google.eclipse.elt.view.preferences.GeneralPreferences.*;
 import static com.google.eclipse.elt.view.ui.Messages.*;
 import static com.google.eclipse.elt.view.util.Platform.userHomeDirectory;
-
-import java.util.UUID;
 
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.action.*;
@@ -64,8 +61,12 @@ public class TerminalView extends ViewPart implements ISaveablePart2 {
 
   private IContextActivation contextActivation;
 
+  /**
+   * Creates a new terminal view.
+   * @param workingDirectory
+   */
   public static void openTerminalView(IPath workingDirectory) {
-    openTerminalView(null, workingDirectory);
+    openNewTerminalView(workingDirectory);
   }
 
   private static int gensym = 0;
@@ -73,17 +74,22 @@ public class TerminalView extends ViewPart implements ISaveablePart2 {
   /**
    * Returns a fresh integer.
    */
-  private static int nextGensym() {
+  private static Integer nextGensym() {
     return gensym++;
   }
   
-  private static void openTerminalView(String id, IPath workingDirectory) {
+  /**
+   * Opens a new {@link TerminalView}.
+   * 
+   * @param workingDirectory The working directory to be opened on initialization.
+   */
+  private static void openNewTerminalView(IPath workingDirectory) {
     IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
     IPath safeWorkingDirectory = (workingDirectory != null) ? workingDirectory : userHomeDirectory();
     try {
       String directoryName = safeWorkingDirectory.lastSegment();
       // Use of gensym to force freshness of the identifier.
-      String secondaryId = (id != null) ? id : safeWorkingDirectory.toString() + nextGensym();
+      String secondaryId = nextGensym().toString();
       TerminalView view = (TerminalView) page.showView(VIEW_ID, secondaryId, VIEW_ACTIVATE);
       view.setPartName(directoryName);
       view.open(safeWorkingDirectory);
@@ -334,7 +340,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2 {
     }
 
     @Override public void run() {
-      openTerminalView(UUID.randomUUID().toString(), workingDirectory);
+      openNewTerminalView(workingDirectory);
     }
   }
 
